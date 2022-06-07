@@ -50,7 +50,7 @@ void APortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+	/*AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
 	AGE_II_P2Character* Character = Cast<AGE_II_P2Character>(PlayerController->GetCharacter());
 	
 	CharacterLocation = Character->GetActorLocation();
@@ -61,7 +61,7 @@ void APortal::Tick(float DeltaTime)
 
 	CameraLocation = SelfLocation - CharacterLocation;
 	
-	OtherPortal->SceneCapture->SetWorldLocationAndRotation(CameraLocation, CameraRotation);
+	OtherPortal->SceneCapture->SetWorldLocationAndRotation(CameraLocation, CameraRotation);*/
 }
 
 void APortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

@@ -3,6 +3,8 @@
 
 #include "MyMathLibrary.h"
 
+#include "Engine/TextureRenderTarget2D.h"
+
 
 /*FVector UMyMathLibrary::ConvertLocation(FVector Location, AActor* Portal, AActor* Target)
 {
@@ -54,6 +56,16 @@ bool UMyMathLibrary::CheckIsInFront(FVector Point, FVector PortalLocation, FVect
 	FPlane PortalPlane = FPlane(PortalLocation, PortalNormal);
 
 	return PortalPlane.PlaneDot(Point) >= 0;
+}
+
+void UMyMathLibrary::ResizeRender(UTextureRenderTarget2D* rendertarget, float sizeX, float sizeY)
+{
+	if (rendertarget == nullptr)
+	{
+		return;
+	}
+
+	rendertarget->ResizeTarget(sizeX,sizeY);
 }
 
 /*bool UMyMathLibrary::CheckIsCrossing(FVector Point, FVector PortalLocation, FVector  PortalNormal, bool out_LastInFront,

@@ -74,7 +74,7 @@ public:
 	
 	bool bCanEnterPortal = true;
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Portal")
 	APortal* OtherPortal;
 	
 	// Function to change IsBluePortal boolean
