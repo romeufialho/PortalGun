@@ -1,0 +1,148 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Portal.h"
+
+#include "GE_II_P2Character.h"
+#include "MyMathLibrary.h"
+#include "MyPlayerController.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+
+
+// Sets default values
+APortal::APortal()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
+	SetRootComponent(RootComponent);
+	
+	PortalScreenMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Screen Mesh"));
+	PortalScreenMesh->SetupAttachment(RootComponent);
+	PortalBorderMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Border Mesh"));
+	PortalBorderMesh->SetupAttachment(RootComponent);
+
+	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Camera"));
+	SceneCapture->SetupAttachment(RootComponent);
+
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Capsule"));
+	BoxComponent->SetupAttachment(RootComponent);
+
+	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &APortal::OnOverlapBegin);
+	BoxComponent->OnComponentEndOverlap.AddDynamic(this, &APortal::OnOverlapEnd);
+
+	BoxComponent->SetGenerateOverlapEvents(true);
+
+}
+
+// Called when the game starts or when spawned
+void APortal::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+// Called every frame
+void APortal::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void APortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//Begin Teleport verifications
+	if (bCanEnterPortal)
+	{
+		if (OtherPortal != nullptr)
+		{
+			const AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+
+			if (PlayerController != nullptr)
+			{
+				AGE_II_P2Character* Character = Cast<AGE_II_P2Character>(PlayerController->GetCharacter());
+
+				if (Character != nullptr)
+				{
+					if(OtherActor == Character)
+					{
+						FHitResult HitResult;
+
+						//TODO: teleport player to other portal
+						//TODO: add offset to the location player gets teleported too to avoid getting stuck
+						FVector TargetLocation = UMyMathLibrary::ConvertLocation(Character->GetActorLocation(), this, OtherPortal);
+						//FVector TargetLocation = OtherPortal->GetActorLocation() + (100.f * OtherPortal->GetActorForwardVector());
+						FRotator TargetRotation = OtherPortal->GetActorRotation();
+		
+						Character->SetActorLocationAndRotation(TargetLocation, TargetRotation, false, &HitResult, ETeleportType::None);
+						UE_LOG(LogTemp, Warning, TEXT("Teleported"));
+
+						//UE_LOG(LogTemp, Warning, TEXT("Character: %s"), *Character->GetName());
+						//UE_LOG(LogTemp, Warning, TEXT("overlap with player"));
+						//UE_LOG(LogTemp, Warning, TEXT("other portal location is: %s"), *TargetLocation.ToString());
+
+						bCanEnterPortal = false;
+
+						OtherPortal->bCanEnterPortal = false;
+					}
+				}
+			}
+		}
+	}
+}
+
+void APortal::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	bCanEnterPortal = true;
+	if (OtherPortal != nullptr)
+	{
+		OtherPortal->bCanEnterPortal = true;
+	}
+}
+
+void APortal::SetIsBluePortal(const bool bValue)
+{
+	IsBluePortal = bValue;
+
+	SetPortalMaterial();
+}
+
+void APortal::SetPortalMaterial() const
+{
+	if (IsBluePortal)
+	{
+		PortalBorderMesh->SetMaterial(0, BlueMaterial);
+		
+		if (OtherPortal != nullptr)
+		{
+			PortalScreenMesh->SetMaterial(0, PortalVisionMaterial_1);
+			OtherPortal->PortalScreenMesh->SetMaterial(0, PortalVisionMaterial_2);
+			SceneCapture->TextureTarget = PortalVision_2;
+		}
+		else
+		{
+			PortalScreenMesh->SetMaterial(0, BlueMaterial);
+		}
+	}
+	else
+	{
+		PortalBorderMesh->SetMaterial(0, OrangeMaterial);
+
+		if (OtherPortal != nullptr)
+		{
+			PortalScreenMesh->SetMaterial(0, PortalVisionMaterial_2);
+			OtherPortal->PortalScreenMesh->SetMaterial(0, PortalVisionMaterial_1);
+			SceneCapture->TextureTarget = PortalVision_1;
+		}
+		else
+		{
+			PortalScreenMesh->SetMaterial(0, OrangeMaterial);
+		}
+	}
+}
+
+
+
