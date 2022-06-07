@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GE_II_P2Character.h"
 #include "Components/BoxComponent.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/Actor.h"
@@ -22,7 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 	
 	// Portal camera
-	UPROPERTY(EditAnywhere, Category = "Portal")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Portal")
 	USceneCaptureComponent2D* SceneCapture;
 
 	// Portal meshes
@@ -35,6 +36,13 @@ protected:
 	// Portal Collision
 	UPROPERTY(VisibleAnywhere,Category = "Portal")
 	UBoxComponent* BoxComponent;
+	
+	FVector CharacterLocation;
+	FRotator CharacterRotation;
+	FVector SelfLocation;
+	FRotator SelfRotation;
+	FVector CameraLocation;
+	FRotator CameraRotation;
 
 public:	
 	// Called every frame

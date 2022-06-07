@@ -4,7 +4,7 @@
 #include "MyMathLibrary.h"
 
 
-FVector UMyMathLibrary::ConvertLocation(FVector Location, AActor* Portal, AActor* Target)
+/*FVector UMyMathLibrary::ConvertLocation(FVector Location, AActor* Portal, AActor* Target)
 {
 	FVector Direction = Location - Portal->GetActorLocation();
 	FVector TargetLocation = Target->GetActorLocation();
@@ -19,7 +19,7 @@ FVector UMyMathLibrary::ConvertLocation(FVector Location, AActor* Portal, AActor
 		+ Dots.Z * Target->GetActorUpVector();
 
 	return TargetLocation + NewDirection;
-}
+}*/
 
 FRotator UMyMathLibrary::ConvertRotator(FRotator Rotation, AActor* Portal, AActor* Target)
 {
@@ -51,11 +51,27 @@ FRotator UMyMathLibrary::ConvertRotator(FRotator Rotation, AActor* Portal, AActo
 
 bool UMyMathLibrary::CheckIsInFront(FVector Point, FVector PortalLocation, FVector PortalNormal)
 {
-	return false;
+	FPlane PortalPlane = FPlane(PortalLocation, PortalNormal);
+
+	return PortalPlane.PlaneDot(Point) >= 0;
 }
 
-bool UMyMathLibrary::CheckIsCrossing(FVector Point, FVector PortaLocation, FVector  PortalNormal, bool out_LastInFront,
+/*bool UMyMathLibrary::CheckIsCrossing(FVector Point, FVector PortalLocation, FVector  PortalNormal, bool out_LastInFront,
 	FVector out_LastPosition)
 {
-	return false;
-}
+	FPlane PortalPlane = FPlane(PortalLocation, PortalNormal);
+	FVector IntersectionPoint;
+	bool IsIntersecting = FMath::SegmentPlaneIntersection(out_LastPosition, Point, PortalPlane, IntersectionPoint);
+	bool IsInFront = CheckIsInFront(Point, PortalLocation, PortalNormal);
+	bool IsCrossing = false;
+
+	if (IsIntersecting && !IsInFront && out_LastInFront)
+	{
+		IsCrossing = true;
+	}
+
+	out_LastInFront = IsInFront;
+	out_LastPosition = Point;
+
+	return IsCrossing;
+}*/

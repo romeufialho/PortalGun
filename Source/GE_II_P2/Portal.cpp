@@ -7,6 +7,7 @@
 #include "MyMathLibrary.h"
 #include "MyPlayerController.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -48,6 +49,19 @@ void APortal::BeginPlay()
 void APortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+	AGE_II_P2Character* Character = Cast<AGE_II_P2Character>(PlayerController->GetCharacter());
+	
+	CharacterLocation = Character->GetActorLocation();
+	CharacterRotation = Character->GetActorRotation();
+
+	SelfLocation = this->GetActorLocation();
+	SelfRotation = this->GetActorRotation();
+
+	CameraLocation = SelfLocation - CharacterLocation;
+	
+	OtherPortal->SceneCapture->SetWorldLocationAndRotation(CameraLocation, CameraRotation);
 }
 
 void APortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -58,7 +72,7 @@ void APortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	{
 		if (OtherPortal != nullptr)
 		{
-			const AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+			AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
 
 			if (PlayerController != nullptr)
 			{
@@ -68,20 +82,26 @@ void APortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 				{
 					if(OtherActor == Character)
 					{
+						FVector SavedVelocity = Character->GetCharacterMovement()->Velocity;
+						
 						FHitResult HitResult;
-
-						//TODO: teleport player to other portal
+						
 						//TODO: add offset to the location player gets teleported too to avoid getting stuck
-						FVector TargetLocation = UMyMathLibrary::ConvertLocation(Character->GetActorLocation(), this, OtherPortal);
-						//FVector TargetLocation = OtherPortal->GetActorLocation() + (100.f * OtherPortal->GetActorForwardVector());
-						FRotator TargetRotation = OtherPortal->GetActorRotation();
+						//FVector TargetLocation = UMyMathLibrary::ConvertLocation(Character->GetActorLocation(), this, OtherPortal);
+						FVector TargetLocation = OtherPortal->GetActorLocation() + (100.f * OtherPortal->GetActorForwardVector());
+						FRotator TargetRotation = UMyMathLibrary::ConvertRotator(Character->GetActorRotation(), this, OtherPortal);
 		
-						Character->SetActorLocationAndRotation(TargetLocation, TargetRotation, false, &HitResult, ETeleportType::None);
+						Character->SetActorLocationAndRotation(TargetLocation, TargetRotation, false, &HitResult, ETeleportType::TeleportPhysics);
 						UE_LOG(LogTemp, Warning, TEXT("Teleported"));
 
-						//UE_LOG(LogTemp, Warning, TEXT("Character: %s"), *Character->GetName());
-						//UE_LOG(LogTemp, Warning, TEXT("overlap with player"));
-						//UE_LOG(LogTemp, Warning, TEXT("other portal location is: %s"), *TargetLocation.ToString());
+						PlayerController->SetControlRotation(UMyMathLibrary::ConvertRotator(PlayerController->GetControlRotation(), this, OtherPortal));
+
+						FVector NewVelocity =
+							FVector::DotProduct(SavedVelocity, GetActorForwardVector()) * OtherPortal->GetActorForwardVector() +
+								FVector::DotProduct(SavedVelocity, GetActorRightVector()) * OtherPortal->GetActorRightVector() +
+									FVector::DotProduct(SavedVelocity, GetActorUpVector()) * OtherPortal->GetActorUpVector();
+
+						Character->GetCharacterMovement()->Velocity = - NewVelocity;
 
 						bCanEnterPortal = false;
 
