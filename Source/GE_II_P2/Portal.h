@@ -36,6 +36,10 @@ protected:
 	// Portal Collision
 	UPROPERTY(VisibleAnywhere,Category = "Portal")
 	UBoxComponent* BoxComponent;
+
+	// Rotated Scene Component
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Portal")
+	USceneComponent* RotatedSceneComponent;
 	
 	FVector CharacterLocation;
 	FRotator CharacterRotation;

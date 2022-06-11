@@ -6,7 +6,9 @@
 #include "GE_II_P2Character.h"
 #include "MyMathLibrary.h"
 #include "MyPlayerController.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/SplineMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -37,6 +39,8 @@ APortal::APortal()
 
 	BoxComponent->SetGenerateOverlapEvents(true);
 
+	RotatedSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RotatedSceneComponent"));
+	RotatedSceneComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -49,19 +53,38 @@ void APortal::BeginPlay()
 void APortal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	/*AMyPlayerController* PlayerController = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
-	AGE_II_P2Character* Character = Cast<AGE_II_P2Character>(PlayerController->GetCharacter());
-	
-	CharacterLocation = Character->GetActorLocation();
-	CharacterRotation = Character->GetActorRotation();
 
-	SelfLocation = this->GetActorLocation();
-	SelfRotation = this->GetActorRotation();
+	if (OtherPortal != nullptr)
+	{
+		// Resize Render Target
+		FVector2D Result;
+		if (GEngine && GEngine->GameViewport)
+		{
+			GEngine->GameViewport->GetViewportSize(Result);
+			SceneCapture->TextureTarget->ResizeTarget(Result.X, Result.Y);
+		} printf("resize render target");
 
-	CameraLocation = SelfLocation - CharacterLocation;
-	
-	OtherPortal->SceneCapture->SetWorldLocationAndRotation(CameraLocation, CameraRotation);*/
+		// Portal Camera Location and Rotation
+		if (RotatedSceneComponent != nullptr)
+		{
+			FTransform Transform = RotatedSceneComponent->GetComponentTransform();
+			APlayerCameraManager* CameraManager = Cast<APlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0));
+			if (CameraManager != nullptr)
+			{
+				FTransform ParentTransform = CameraManager->GetTransform();
+				FTransform NewTransform = UKismetMathLibrary::MakeRelativeTransform(ParentTransform, Transform);
+				FHitResult HitResult;
+				OtherPortal->SceneCapture->SetRelativeLocationAndRotation(
+					NewTransform.GetLocation(), NewTransform.GetRotation(), false, &HitResult, ETeleportType::None);
+			}	printf("portal camera location and rotaton");
+
+			// Custom Near Clipping Plane
+			float NearClippingDistance = 1.f + UKismetMathLibrary::Vector_Distance(
+				CameraManager->GetTransform().GetLocation(), this->GetActorLocation());
+			OtherPortal->SceneCapture->CustomNearClippingPlane = NearClippingDistance;
+			printf("custom near clipping plane");
+		}	
+	}
 }
 
 void APortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

@@ -24,6 +24,7 @@ public:
 	/*bool CheckIsCrossing(FVector Point, FVector PortaLocation, FVector PortalNormal,
 		bool out_LastInFront, FVector out_LastPosition);*/
 
+	// this is only for blueprint calling and testing, not needed in final version
 	UFUNCTION(BlueprintCallable, Category = "Portal")
-	static void ResizeRender(UTextureRenderTarget2D* rendertarget, float sizeX, float sizeY);
+	void ResizeRender(UTextureRenderTarget2D* rendertarget, float sizeX, float sizeY);
 };
