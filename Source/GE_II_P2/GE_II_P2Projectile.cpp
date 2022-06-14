@@ -87,5 +87,11 @@ void AGE_II_P2Projectile::SetProjectileMaterial()
 	}
 }
 
+// Different Guns
+
+int AGE_II_P2Projectile::GetBulletType() {
+	return BulletType;
+}
+
 
 

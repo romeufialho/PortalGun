@@ -54,4 +54,11 @@ public:
 
 	void SetProjectileMaterial();
 	
+
+	//Different Guns
+
+	int GetBulletType();
+
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+		int BulletType;
 };

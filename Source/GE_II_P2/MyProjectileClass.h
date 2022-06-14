@@ -17,7 +17,7 @@ class GE_II_P2_API AMyProjectileClass : public AGE_II_P2Projectile
 public:
 
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
-
+	
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Projectile")
@@ -27,7 +27,6 @@ protected:
 		float BulletHeadShotMultiplier;
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
-		int BulletType;
-
+		float CooldownBetweenShots;
 	
 };
