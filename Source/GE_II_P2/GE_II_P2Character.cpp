@@ -88,11 +88,12 @@ void AGE_II_P2Character::BeginPlay()
 void AGE_II_P2Character::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	HandlePortalPlacement();
 	//Gun Types
-	if (ProjectileClass.GetDefaultObject()->GetBulletType()) {
-		HandlePortalPlacement();
-	}
+
+	//if (ProjectileClass.GetDefaultObject()->GetBulletType()) {
+	//	
+	//}
 }
 
 //////////////////////////////////////////////////////////////////////////
