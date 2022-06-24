@@ -62,7 +62,7 @@ void APortal::Tick(float DeltaTime)
 		{
 			GEngine->GameViewport->GetViewportSize(Result);
 			SceneCapture->TextureTarget->ResizeTarget(Result.X, Result.Y);
-		} printf("resize render target");
+		}
 
 		// Portal Camera Location and Rotation
 		if (RotatedSceneComponent != nullptr)
