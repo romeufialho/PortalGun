@@ -58,14 +58,14 @@ void APortal::Tick(float DeltaTime)
 	{
 		// Resize Render Target
 		FVector2D Result;
-		if (GEngine && GEngine->GameViewport)
+		/*if (GEngine && GEngine->GameViewport)
 		{
 			GEngine->GameViewport->GetViewportSize(Result);
 			SceneCapture->TextureTarget->ResizeTarget(Result.X, Result.Y);
-		}
+		}*/
 
 		// Portal Camera Location and Rotation
-		if (RotatedSceneComponent != nullptr)
+		if (RotatedSceneComponent->IsValidLowLevelFast())
 		{
 			FTransform Transform = RotatedSceneComponent->GetComponentTransform();
 			APlayerCameraManager* CameraManager = Cast<APlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0));
@@ -76,13 +76,12 @@ void APortal::Tick(float DeltaTime)
 				FHitResult HitResult;
 				OtherPortal->SceneCapture->SetRelativeLocationAndRotation(
 					NewTransform.GetLocation(), NewTransform.GetRotation(), false, &HitResult, ETeleportType::None);
-			}	printf("portal camera location and rotaton");
+			}
 
 			// Custom Near Clipping Plane
 			float NearClippingDistance = 1.f + UKismetMathLibrary::Vector_Distance(
 				CameraManager->GetTransform().GetLocation(), this->GetActorLocation());
 			OtherPortal->SceneCapture->CustomNearClippingPlane = NearClippingDistance;
-			printf("custom near clipping plane");
 		}	
 	}
 }

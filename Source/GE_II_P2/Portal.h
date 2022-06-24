@@ -37,9 +37,9 @@ protected:
 	UPROPERTY(VisibleAnywhere,Category = "Portal")
 	UBoxComponent* BoxComponent;
 
-	// Rotated Scene Component
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Portal")
-	USceneComponent* RotatedSceneComponent;
+	//// Rotated Scene Component
+	//UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Portal")
+	//USceneComponent* RotatedSceneComponent;
 	
 	FVector CharacterLocation;
 	FRotator CharacterRotation;
@@ -51,6 +51,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Rotated Scene Component
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Portal")
+	USceneComponent* RotatedSceneComponent;
 
 	// Materials
 	UPROPERTY(EditAnywhere, Category="Portal")
