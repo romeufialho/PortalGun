@@ -68,12 +68,17 @@ void AGE_II_P2Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 	}
 	Destroy();
 }
+void AGE_II_P2Projectile::BeginPlay() {
+	Super::BeginPlay();
 
+	//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("spawned projetii")));;
+
+}
 void AGE_II_P2Projectile::SetIsBlueProjectile(bool bValue)
 {
-	bIsBlue = bValue;
-	
-	SetProjectileMaterial();
+		bIsBlue = bValue;
+
+		SetProjectileMaterial();
 }
 
 void AGE_II_P2Projectile::SetProjectileMaterial()

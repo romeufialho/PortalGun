@@ -29,6 +29,8 @@ class AGE_II_P2Projectile : public AActor
 public:
 	AGE_II_P2Projectile();
 
+	virtual void BeginPlay() override;
+
 	/** called when projectile hits something */
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
@@ -59,6 +61,6 @@ public:
 
 	int GetBulletType();
 
-	UPROPERTY(EditAnywhere, Category = "Projectile")
+	UPROPERTY(EditAnywhere, Category = "Multiple Weapons")
 		int BulletType;
 };

@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GE_II_P2HUD.h"
+#include "GE_II_P2Projectile.h"
 #include "GameFramework/Character.h"
+
 #include "GE_II_P2Character.generated.h"
 
 
@@ -58,13 +60,29 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector GunOffset;
 
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class AGE_II_P2Projectile> ProjectileClass;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
+		TSubclassOf<AActor> ProjectileClass;
+	//class AGE_II_P2Projectile* ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
+		TSubclassOf<AActor> DefaultProjectileClass;
+		
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
+		TSubclassOf<AActor> PortalProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
+		TSubclassOf<AActor> ARProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
+		TSubclassOf<AActor> ShotgunProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
+		TSubclassOf<AActor> RocketProjectileClass;
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,8 +175,17 @@ protected:
 	//reference to world
 	UWorld* ThisWorld;
 	
+
+	AGE_II_P2Projectile* RuntimeProjectileClass;
+	AGE_II_P2Projectile* RuntimePortalProjectileClass;
+	AGE_II_P2Projectile* RuntimeARProjectileClass;
+	AGE_II_P2Projectile* RuntimeShotgunProjectileClass;
+	AGE_II_P2Projectile* RuntimeRocketProjectileClass;
+
+
 	//function that checks if the portal can be placed or not
 	bool HandlePortalPlacement();
+
 
 
 public:

@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Templates/Casts.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -70,6 +71,17 @@ AGE_II_P2Character::AGE_II_P2Character()
 	//bUsingMotionControllers = true;
 
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+
+
+	//////////////////////////////////////////////////
+
+
+
+
+
+
+
+
 }
 
 void AGE_II_P2Character::BeginPlay()
@@ -83,17 +95,31 @@ void AGE_II_P2Character::BeginPlay()
 	ThisWorld = GetWorld();
 
 	MyHUD = Cast<AGE_II_P2HUD>(UGameplayStatics::GetPlayerController(this->GetOwner(), 0)->GetHUD()); 
+
+
+	///////////////////////////////////////////////////////////////////////////
+
+	RuntimeProjectileClass = Cast<AGE_II_P2Projectile>(ProjectileClass->GetClass());
+	RuntimePortalProjectileClass = Cast<AGE_II_P2Projectile>(PortalProjectileClass->GetClass());
+	RuntimeARProjectileClass = Cast<AGE_II_P2Projectile>(ARProjectileClass);
+	RuntimeShotgunProjectileClass = Cast<AGE_II_P2Projectile>(ShotgunProjectileClass);
+	RuntimeRocketProjectileClass = Cast<AGE_II_P2Projectile>(RocketProjectileClass);
+	
+
 }
 
 void AGE_II_P2Character::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	HandlePortalPlacement();
+	
+
+
 	//Gun Types
 
-	//if (ProjectileClass.GetDefaultObject()->GetBulletType()) {
-	//	
+	//if (Cast<AGE_II_P2Projectile>(ProjectileClass)->GetBulletType() == 4) {
+	HandlePortalPlacement();
 	//}
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -134,19 +160,41 @@ void AGE_II_P2Character::SetupPlayerInputComponent(class UInputComponent* Player
 
 void AGE_II_P2Character::OnFireLeft()
 {
-	if (CanSpawnPortal)
-	{
-		OnFire()->SetIsBlueProjectile(true);
-		UE_LOG(LogTemp, Warning, TEXT("fired left"));
+	if (RuntimeProjectileClass && RuntimeProjectileClass->GetBulletType() == RuntimePortalProjectileClass->GetBulletType()) {
+		if (CanSpawnPortal)
+		{
+			OnFire()->SetIsBlueProjectile(true);
+
+			//Cast<AGE_II_P2Projectile>(ProjectileClass)->SetIsBlueProjectile(true);
+
+			//UE_LOG(LogTemp, Warning, TEXT("fired left"));
+
+		}
+	}
+	else {
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("Not Portal Fire")));;
+		if (RuntimeProjectileClass == nullptr) {
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("RUNTIME PROJ NULL PE TE ERRE WHYYYYYYYYYYYYYYYYYYY")));;
+		}
 	}
 }
 
 void AGE_II_P2Character::OnFireRight()
 {
-	if (CanSpawnPortal)
-	{
-		OnFire()->SetIsBlueProjectile(false);
-		UE_LOG(LogTemp, Warning, TEXT("fired right"));
+	if (RuntimeProjectileClass && RuntimeProjectileClass->GetBulletType() == RuntimePortalProjectileClass->GetBulletType()) {
+		if (CanSpawnPortal)
+		{
+			OnFire()->SetIsBlueProjectile(false);
+
+			//Cast<AGE_II_P2Projectile>(ProjectileClass)->SetIsBlueProjectile(false);
+
+			//UE_LOG(LogTemp, Warning, TEXT("fired right"));
+
+		}
+	}
+	else {
+
+
 	}
 }
 
@@ -156,6 +204,13 @@ AGE_II_P2Projectile* AGE_II_P2Character::OnFire() const
 	//if (ProjectileClass != nullptr)
 	//{
 		UWorld* const World = GetWorld();
+
+	/*	if (World != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("World Existe")));;
+
+		}*/
+
 		//if (World != nullptr)
 		//{
 				const FRotator SpawnRotation = GetControlRotation();
@@ -165,7 +220,7 @@ AGE_II_P2Projectile* AGE_II_P2Character::OnFire() const
 	
 				//Set Spawn Collision Handling Override
 				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
 				//NOT ALL CONTROL PATHS RETURN A VALUE
 				// -> commented if blocks
@@ -188,9 +243,19 @@ AGE_II_P2Projectile* AGE_II_P2Character::OnFire() const
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
-	
+
+	if (RuntimeProjectileClass == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("+351 808242424")));;
+
+		return NULL;
+	}
+
+	AGE_II_P2Projectile* projectile = World->SpawnActor<AGE_II_P2Projectile>(RuntimeProjectileClass->GetClass(), SpawnLocation, SpawnRotation, ActorSpawnParams);
+
 	// spawn the projectile at the muzzle
-	return World->SpawnActor<AGE_II_P2Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+	return projectile;
 }
 
 void AGE_II_P2Character::OnResetVR()
