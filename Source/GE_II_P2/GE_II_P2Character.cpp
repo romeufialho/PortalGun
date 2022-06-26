@@ -72,16 +72,6 @@ AGE_II_P2Character::AGE_II_P2Character()
 
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 
-
-	//////////////////////////////////////////////////
-
-
-
-
-
-
-
-
 }
 
 void AGE_II_P2Character::BeginPlay()
@@ -97,15 +87,6 @@ void AGE_II_P2Character::BeginPlay()
 	MyHUD = Cast<AGE_II_P2HUD>(UGameplayStatics::GetPlayerController(this->GetOwner(), 0)->GetHUD()); 
 
 
-	///////////////////////////////////////////////////////////////////////////
-
-	RuntimeProjectileClass = Cast<AGE_II_P2Projectile>(ProjectileClass->GetClass());
-	RuntimePortalProjectileClass = Cast<AGE_II_P2Projectile>(PortalProjectileClass->GetClass());
-	RuntimeARProjectileClass = Cast<AGE_II_P2Projectile>(ARProjectileClass);
-	RuntimeShotgunProjectileClass = Cast<AGE_II_P2Projectile>(ShotgunProjectileClass);
-	RuntimeRocketProjectileClass = Cast<AGE_II_P2Projectile>(RocketProjectileClass);
-	
-
 }
 
 void AGE_II_P2Character::Tick(float DeltaSeconds)
@@ -116,9 +97,9 @@ void AGE_II_P2Character::Tick(float DeltaSeconds)
 
 	//Gun Types
 
-	//if (Cast<AGE_II_P2Projectile>(ProjectileClass)->GetBulletType() == 4) {
-	HandlePortalPlacement();
-	//}
+	if (CurrentBulletType == Portal_BulletType) {
+		HandlePortalPlacement();
+	}
 	
 }
 
@@ -160,7 +141,7 @@ void AGE_II_P2Character::SetupPlayerInputComponent(class UInputComponent* Player
 
 void AGE_II_P2Character::OnFireLeft()
 {
-	if (RuntimeProjectileClass && RuntimeProjectileClass->GetBulletType() == RuntimePortalProjectileClass->GetBulletType()) {
+	if (CurrentBulletType == Portal_BulletType) {
 		if (CanSpawnPortal)
 		{
 			OnFire()->SetIsBlueProjectile(true);
@@ -172,16 +153,13 @@ void AGE_II_P2Character::OnFireLeft()
 		}
 	}
 	else {
-		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("Not Portal Fire")));;
-		if (RuntimeProjectileClass == nullptr) {
-			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("RUNTIME PROJ NULL PE TE ERRE WHYYYYYYYYYYYYYYYYYYY")));;
-		}
+		OnFire()->SetIsBlueProjectile(false);
 	}
 }
 
 void AGE_II_P2Character::OnFireRight()
 {
-	if (RuntimeProjectileClass && RuntimeProjectileClass->GetBulletType() == RuntimePortalProjectileClass->GetBulletType()) {
+	if (CurrentBulletType == Portal_BulletType) {
 		if (CanSpawnPortal)
 		{
 			OnFire()->SetIsBlueProjectile(false);
@@ -193,8 +171,7 @@ void AGE_II_P2Character::OnFireRight()
 		}
 	}
 	else {
-
-
+		OnFire()->SetIsBlueProjectile(false);
 	}
 }
 
@@ -244,14 +221,7 @@ AGE_II_P2Projectile* AGE_II_P2Character::OnFire() const
 		}
 	}
 
-	if (RuntimeProjectileClass == nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("+351 808242424")));;
-
-		return NULL;
-	}
-
-	AGE_II_P2Projectile* projectile = World->SpawnActor<AGE_II_P2Projectile>(RuntimeProjectileClass->GetClass(), SpawnLocation, SpawnRotation, ActorSpawnParams);
+	AGE_II_P2Projectile* projectile = World->SpawnActor<AGE_II_P2Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 
 	// spawn the projectile at the muzzle
 
@@ -531,3 +501,9 @@ bool AGE_II_P2Character::HandlePortalPlacement()
 	}
 	return false;
 }
+
+int AGE_II_P2Character::GetPlayerCurrentBulletType()
+{
+	return CurrentBulletType;
+}
+

@@ -59,8 +59,9 @@ public:
 
 	//Different Guns
 
-	int GetBulletType();
 
-	UPROPERTY(EditAnywhere, Category = "Multiple Weapons")
-		int BulletType;
+	TArray<int>Damage_BulletTypesArray;
+	TArray<int>FireRate_BulletTypesArray;
+	TArray<int>Size_BulletTypesArray;
+
 };

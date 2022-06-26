@@ -6,6 +6,9 @@
 #include "GE_II_P2HUD.h"
 #include "GE_II_P2Projectile.h"
 #include "GameFramework/Character.h"
+#include "Templates/Casts.h"
+
+
 
 #include "GE_II_P2Character.generated.h"
 
@@ -66,23 +69,9 @@ public:
 
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
-		TSubclassOf<AActor> ProjectileClass;
-	//class AGE_II_P2Projectile* ProjectileClass;
+		//TSubclassOf<AActor> ProjectileClass;
+		TSubclassOf<AGE_II_P2Projectile> ProjectileClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
-		TSubclassOf<AActor> DefaultProjectileClass;
-		
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
-		TSubclassOf<AActor> PortalProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
-		TSubclassOf<AActor> ARProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
-		TSubclassOf<AActor> ShotgunProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Projectile)
-		TSubclassOf<AActor> RocketProjectileClass;
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,14 +163,6 @@ protected:
 
 	//reference to world
 	UWorld* ThisWorld;
-	
-
-	AGE_II_P2Projectile* RuntimeProjectileClass;
-	AGE_II_P2Projectile* RuntimePortalProjectileClass;
-	AGE_II_P2Projectile* RuntimeARProjectileClass;
-	AGE_II_P2Projectile* RuntimeShotgunProjectileClass;
-	AGE_II_P2Projectile* RuntimeRocketProjectileClass;
-
 
 	//function that checks if the portal can be placed or not
 	bool HandlePortalPlacement();
@@ -193,6 +174,22 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	int CurrentBulletType = 0;
+	int AR_BulletType = 0;
+	int Shotgun_BulletType = 1;
+	int Rocket_BulletType = 2;
+	int Portal_BulletType = 3;
+
+	// 0 = AR
+	// 1 = Shotgun
+	// 2 = Rocket
+	// 3 = Portal
+
+
+
+
+	int GetPlayerCurrentBulletType();
 	
 };
 
