@@ -57,11 +57,5 @@ public:
 	void SetProjectileMaterial();
 	
 
-	//Different Guns
-
-
-	TArray<int>Damage_BulletTypesArray;
-	TArray<int>FireRate_BulletTypesArray;
-	TArray<int>Size_BulletTypesArray;
 
 };

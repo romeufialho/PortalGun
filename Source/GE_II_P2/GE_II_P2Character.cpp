@@ -12,6 +12,9 @@
 #include "MotionControllerComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Templates/Casts.h"
+#include "Engine/EngineTypes.h"
+#include "Containers/UnrealString.h"
+#include "GameFramework/Actor.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -86,6 +89,12 @@ void AGE_II_P2Character::BeginPlay()
 
 	MyHUD = Cast<AGE_II_P2HUD>(UGameplayStatics::GetPlayerController(this->GetOwner(), 0)->GetHUD()); 
 
+	CurrentHP = MaxHP;
+
+
+	SetGunColor(Colors_BulletTypesArray[CurrentBulletType]);
+
+	SetCanBeDamaged(true);
 
 }
 
@@ -137,6 +146,12 @@ void AGE_II_P2Character::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAxis("TurnRate", this, &AGE_II_P2Character::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGE_II_P2Character::LookUpAtRate);
+
+
+
+	PlayerInputComponent->BindAction("NextWeapon", IE_Pressed, this, &AGE_II_P2Character::NextWeapon);
+	PlayerInputComponent->BindAction("PreviousWeapon", IE_Pressed, this, &AGE_II_P2Character::PreviousWeapon);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AGE_II_P2Character::Reload);
 }
 
 void AGE_II_P2Character::OnFireLeft()
@@ -193,11 +208,11 @@ AGE_II_P2Projectile* AGE_II_P2Character::OnFire() const
 				const FRotator SpawnRotation = GetControlRotation();
 				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 				// const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
-				const FVector SpawnLocation =  (FirstPersonCameraComponent->GetComponentLocation() + FirstPersonCameraComponent->GetForwardVector() * FVector(200.f, 200.f,0));
+				const FVector SpawnLocation = (FP_MuzzleLocation->GetComponentLocation() + FirstPersonCameraComponent->GetForwardVector() * 200.f + FVector(0.f, -10.f, 50.f));
 	
 				//Set Spawn Collision Handling Override
 				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	
 				//NOT ALL CONTROL PATHS RETURN A VALUE
 				// -> commented if blocks
@@ -223,6 +238,7 @@ AGE_II_P2Projectile* AGE_II_P2Character::OnFire() const
 
 	AGE_II_P2Projectile* projectile = World->SpawnActor<AGE_II_P2Projectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 
+	projectile->SetActorScale3D(projectile->GetActorScale() * Size_BulletTypesArray[CurrentBulletType]);
 	// spawn the projectile at the muzzle
 
 	return projectile;
@@ -502,8 +518,96 @@ bool AGE_II_P2Character::HandlePortalPlacement()
 	return false;
 }
 
+
+//float AGE_II_P2Character::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser){
+//	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+//
+//	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("%f"), DamageAmount));
+//
+//	CurrentHP -= DamageAmount;
+//
+//	if (CurrentHP <= 0.f) {
+//		Destroy();
+//	}
+//
+//
+//	return 0.f;
+//}
+
+/////////////////
+
+
+
+void AGE_II_P2Character::NextWeapon() 
+{
+	if (CurrentBulletType == Size_BulletTypesArray.Num()-1) {
+		CurrentBulletType = 0;
+	}
+	else {
+		CurrentBulletType++;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("next weaponn")));
+
+	SetGunColor(Colors_BulletTypesArray[CurrentBulletType]);
+}
+void AGE_II_P2Character::PreviousWeapon() {
+	if (CurrentBulletType == 0) {
+		CurrentBulletType = Size_BulletTypesArray.Num()-1;
+	}
+	else {
+		CurrentBulletType--;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("previouse weaponn")));
+
+
+	SetGunColor(Colors_BulletTypesArray[CurrentBulletType]);
+}
+
+void ReceiveAnyDamage(float Damage,	const class UDamageType* DamageType,class AController* InstigatedBy,AActor* DamageCauser) {
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("OWWWWWWWWWWWWWWWWWCH")));
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+void AGE_II_P2Character::SetGunColor(FLinearColor ColorIn) {
+	FVector4 NewColor;
+	NewColor = ColorIn;
+
+	FP_Gun->SetVectorParameterValueOnMaterials("BodyColor", NewColor);
+}
+void AGE_II_P2Character::Reload() {
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("reloading...")));
+}
+
 int AGE_II_P2Character::GetPlayerCurrentBulletType()
 {
 	return CurrentBulletType;
+}
+
+float AGE_II_P2Character::GetCurrentPlayer_DamageBulletType()
+{
+	return Damage_BulletTypesArray[CurrentBulletType];
+}
+
+float AGE_II_P2Character::GetCurrentPlayer_FireRateBulletType()
+{
+	return FireRate_BulletTypesArray[CurrentBulletType];
+}
+float AGE_II_P2Character::GetCurrentPlayer_RadiusBulletType()
+{
+	return Radius_BulletTypesArray[CurrentBulletType];
 }
 

@@ -6,7 +6,10 @@
 #include "GE_II_P2HUD.h"
 #include "GE_II_P2Projectile.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/Pawn.h"
 #include "Templates/Casts.h"
+#include "Math/Color.h"
+#include "Kismet/GameplayStatics.h"
 
 
 
@@ -122,6 +125,14 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
+	///////////////////////////////////
+
+	void NextWeapon();
+
+	void PreviousWeapon();
+
+	void Reload();
+
 	struct TouchData
 	{
 		TouchData() { bIsPressed = false;Location=FVector::ZeroVector;}
@@ -164,6 +175,11 @@ protected:
 	//reference to world
 	UWorld* ThisWorld;
 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	//function that checks if the portal can be placed or not
 	bool HandlePortalPlacement();
 
@@ -186,10 +202,39 @@ public:
 	// 2 = Rocket
 	// 3 = Portal
 
+	//virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
+
+	UPROPERTY(EditDefaultsOnly, Category=Projectile)
+	float MaxHP = 100.f;
+
+	float CurrentHP = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TArray<float>Size_BulletTypesArray;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TArray<FLinearColor>Colors_BulletTypesArray;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TArray<float>Damage_BulletTypesArray = { 20.f, 5.f, 80.f, 0.f };
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TArray<float>FireRate_BulletTypesArray = { 1 / 5.f, 2 / 1.f, 5.f, 0.f };
+	
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TArray<float>Radius_BulletTypesArray = { 1.f, 20.f, 40.f, 0.f };
 
 
 	int GetPlayerCurrentBulletType();
+
+	float GetCurrentPlayer_DamageBulletType();
+
+	float GetCurrentPlayer_FireRateBulletType();
+
+	float GetCurrentPlayer_RadiusBulletType();
+
+	void SetGunColor(FLinearColor ColorIn);		
 	
 };
 

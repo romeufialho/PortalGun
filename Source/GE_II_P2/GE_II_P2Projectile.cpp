@@ -7,6 +7,12 @@
 #include "Portal_Manager.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Engine/EngineTypes.h"
+#include "SceneManagement.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
+
+
 
 AGE_II_P2Projectile::AGE_II_P2Projectile() 
 {
@@ -53,9 +59,11 @@ void AGE_II_P2Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 
 	if (MyPlayerCharacter != nullptr) {
 
-		int PlayerBulletType = MyPlayerCharacter->GetPlayerCurrentBulletType();
+		int CurrentPlayer_BulletType = MyPlayerCharacter->GetPlayerCurrentBulletType();
+		float CurrentPlayer_Damage_BulletTypes = MyPlayerCharacter->GetCurrentPlayer_DamageBulletType();
+		float CurrentPlayer_Radius_BulletTypes = MyPlayerCharacter->GetCurrentPlayer_RadiusBulletType();
 
-		if (PlayerBulletType == MyPlayerCharacter->Portal_BulletType){
+		if (CurrentPlayer_BulletType == MyPlayerCharacter->Portal_BulletType){
 			// Only add impulse and destroy projectile if we hit a physics
 			if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) /*&& OtherComp->IsSimulatingPhysics()*/)
 			{
@@ -87,18 +95,54 @@ void AGE_II_P2Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("OUTRO PLAYER NAO EXISTEEEEEEEEEEEEEEEEEEEEEE")));
 				}else
 				{
-					FDamageEvent DamageEvent;
-					OtherPlayer->TakeDamage(10.f, DamageEvent, PlayerController, MyPlayerCharacter);
-					GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("DAMAGED PLAYER")));
+					FRadialDamageEvent DamageEvent;					
+
+					DamageEvent.Params.MinimumDamage = 20.f;
+					DamageEvent.Params.BaseDamage = CurrentPlayer_Damage_BulletTypes;
+					DamageEvent.Params.InnerRadius = (CurrentPlayer_Radius_BulletTypes / 10.f);
+					DamageEvent.Params.OuterRadius = CurrentPlayer_Radius_BulletTypes;
+					DamageEvent.Params.DamageFalloff = 0.1f;
+
+					//float Distance = FVector::Dist(DamageEvent.Origin, Hit.ImpactPoint);
+					//float CalcDamage = DamageEvent.Params.BaseDamage * ( 1/ (Distance * DamageEvent.Params.DamageFalloff * (DamageEvent.Params.OuterRadius - DamageEvent.Params.InnerRadius) ));
+					//float CalcDamage = DamageEvent.Params.GetDamageScale(Distance) * DamageEvent.Params.BaseDamage;
+					//if (CalcDamage < DamageEvent.Params.MinimumDamage) {
+					//	CalcDamage = DamageEvent.Params.MinimumDamage;
+					//}
+					//OtherPlayer->TakeDamage(Distance, DamageEvent, PlayerController, MyPlayerCharacter);					
+					//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("DAMAGED PLAYER")));
+					
+
+					UGameplayStatics::ApplyRadialDamageWithFalloff
+					(
+						OtherPlayer,
+						DamageEvent.Params.BaseDamage,
+						DamageEvent.Params.MinimumDamage,
+						DamageEvent.Origin,
+						DamageEvent.Params.InnerRadius,
+						DamageEvent.Params.OuterRadius,
+						DamageEvent.Params.DamageFalloff,
+						DamageEvent.DamageTypeClass,
+						TArray< AActor*>(),
+						MyPlayerCharacter,
+						PlayerController,
+						ECollisionChannel::ECC_WorldStatic
+					);
+
+					
+					DrawDebugSphere(GetWorld(), Hit.ImpactPoint, DamageEvent.Params.GetMaxRadius(), 16, FColor::Red, false, 10.f, -100.f, 2.f);
+					DrawDebugSphere(GetWorld(), Hit.ImpactPoint, DamageEvent.Params.InnerRadius, 16, FColor::Blue, false, 10.f, -100.f, 2.f);
+					
 				}
 			}
 		}
+		Destroy();
 	}
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("NAO EXISTE PLAYER")));
 	}
 
-	Destroy();
+	
 }
 void AGE_II_P2Projectile::BeginPlay() {
 	Super::BeginPlay();

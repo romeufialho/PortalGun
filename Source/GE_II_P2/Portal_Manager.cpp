@@ -2,7 +2,6 @@
 
 #include "Portal_Manager.h"
 #include "Portal.h"
-#include "BehaviorTree/Decorators/BTDecorator_CompareBBEntries.h"
 
 // Sets default values
 APortal_Manager::APortal_Manager()
