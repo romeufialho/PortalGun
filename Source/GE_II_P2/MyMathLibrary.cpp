@@ -51,12 +51,13 @@ FRotator UMyMathLibrary::ConvertRotator(FRotator Rotation, AActor* Portal, AActo
 	return NewWorldQuat.Rotator();
 }
 
+/*
 bool UMyMathLibrary::CheckIsInFront(FVector Point, FVector PortalLocation, FVector PortalNormal)
 {
 	FPlane PortalPlane = FPlane(PortalLocation, PortalNormal);
 
 	return PortalPlane.PlaneDot(Point) >= 0;
-}
+}*/
 
 void UMyMathLibrary::ResizeRender(UTextureRenderTarget2D* rendertarget, float sizeX, float sizeY)
 {
