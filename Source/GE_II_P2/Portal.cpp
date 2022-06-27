@@ -51,38 +51,39 @@ void APortal::BeginPlay()
 // Called every frame
 void APortal::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+    Super::Tick(DeltaTime);
+	/*
+    if (OtherPortal != nullptr)
+    {
+        // Resize Render Target
+        FVector2D Result;
+        if (GEngine && GEngine->GameViewport)
+        {
+            GEngine->GameViewport->GetViewportSize(Result);
+            SceneCapture->TextureTarget->ResizeTarget(Result.X, Result.Y);
+        } //printf("resize render target");
 
-	if (OtherPortal != nullptr)
-	{
-		// Resize Render Target
-		FVector2D Result;
-		/*if (GEngine && GEngine->GameViewport)
-		{
-			GEngine->GameViewport->GetViewportSize(Result);
-			SceneCapture->TextureTarget->ResizeTarget(Result.X, Result.Y);
-		}*/
+        // Portal Camera Location and Rotation
+        if (RotatedSceneComponent != nullptr)
+        {
+            FTransform Transform = RotatedSceneComponent->GetComponentTransform();
+            APlayerCameraManager* CameraManager = Cast<APlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0));
+            if (CameraManager != nullptr)
+            {
+                FTransform ParentTransform = CameraManager->GetTransform();
+                FTransform NewTransform = UKismetMathLibrary::MakeRelativeTransform(ParentTransform, Transform);
+                FHitResult HitResult;
+                OtherPortal->SceneCapture->SetRelativeLocationAndRotation(
+                    NewTransform.GetLocation(), NewTransform.GetRotation(), false, &HitResult, ETeleportType::None);
+            }    //printf("portal camera location and rotaton");
 
-		// Portal Camera Location and Rotation
-		if (RotatedSceneComponent->IsValidLowLevelFast())
-		{
-			FTransform Transform = RotatedSceneComponent->GetComponentTransform();
-			APlayerCameraManager* CameraManager = Cast<APlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0));
-			if (CameraManager != nullptr)
-			{
-				FTransform ParentTransform = CameraManager->GetTransform();
-				FTransform NewTransform = UKismetMathLibrary::MakeRelativeTransform(ParentTransform, Transform);
-				FHitResult HitResult;
-				OtherPortal->SceneCapture->SetRelativeLocationAndRotation(
-					NewTransform.GetLocation(), NewTransform.GetRotation(), false, &HitResult, ETeleportType::None);
-			}
-
-			// Custom Near Clipping Plane
-			float NearClippingDistance = 1.f + UKismetMathLibrary::Vector_Distance(
-				CameraManager->GetTransform().GetLocation(), this->GetActorLocation());
-			OtherPortal->SceneCapture->CustomNearClippingPlane = NearClippingDistance;
-		}	
-	}
+            // Custom Near Clipping Plane
+            float NearClippingDistance = 1.f + UKismetMathLibrary::Vector_Distance(
+                CameraManager->GetTransform().GetLocation(), this->GetActorLocation());
+            OtherPortal->SceneCapture->CustomNearClippingPlane = NearClippingDistance;
+            //printf("custom near clipping plane");
+        }    
+    }*/
 }
 
 void APortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
