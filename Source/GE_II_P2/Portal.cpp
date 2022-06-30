@@ -108,7 +108,6 @@ void APortal::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 						
 						FHitResult HitResult;
 						
-						//TODO: add offset to the location player gets teleported too to avoid getting stuck
 						//FVector TargetLocation = UMyMathLibrary::ConvertLocation(Character->GetActorLocation(), this, OtherPortal);
 						FVector TargetLocation = OtherPortal->GetActorLocation() + (100.f * OtherPortal->GetActorForwardVector());
 						FRotator TargetRotation = UMyMathLibrary::ConvertRotator(Character->GetActorRotation(), this, OtherPortal);
