@@ -43,9 +43,9 @@ void AWeaponSpawner::Tick(float DeltaTime)
 
 }
 
-void AWeaponSpawner::SpawnWeapon(USkeletalMeshComponent* Weapon)
+void AWeaponSpawner::SpawnWeapon(AWeapon* Weapon)
 {
-	
+	//TODO: Spawn given weapon actor with upwards offset
 }
 
 void AWeaponSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -62,11 +62,14 @@ void AWeaponSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 			if(OtherActor == Character)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Overlap With Player Detected"));
-				//TODO: destroy or inactivate weapon mesh
-				Weapon->SetActive(false);
-				BoxComponent->SetActive(false);
-				//TODO: update player's available weapons
 				
+				if (Weapon->GetVisibleFlag())
+				{
+					Weapon->SetVisibility(false);
+					//TODO: update player's available weapon
+					StartTimer();
+				}else
+					UE_LOG(LogTemp, Warning, TEXT("Weapon On Cooldown"));
 			}
 		}
 	}
@@ -76,5 +79,16 @@ void AWeaponSpawner::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	
+}
+
+void AWeaponSpawner::StartTimer()
+{
+	GetWorldTimerManager().SetTimer(_loopTimeHandle, this, &AWeaponSpawner::OnTimerEnd, RespawnTime, false);
+}
+
+void AWeaponSpawner::OnTimerEnd()
+{
+	Weapon->SetVisibility(true);
+	UE_LOG(LogTemp, Warning, TEXT("Weapon Cooldown Over"));
 }
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Weapon.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "WeaponSpawner.generated.h"
@@ -34,6 +35,9 @@ protected:
 	UBoxComponent* BoxComponent;
 
 private:
+	FTimerHandle _loopTimeHandle;
+
+	float RespawnTime = 5.f;
 
 	
 	// /////////////////////// FUNCTIONS /////////////////////////////////////
@@ -41,7 +45,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	static void SpawnWeapon(USkeletalMeshComponent* Weapon);
+	static void SpawnWeapon(AWeapon* Weapon);
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -50,6 +54,12 @@ public:
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
+
+	UFUNCTION()
+	void StartTimer();
+
+	UFUNCTION()
+	void OnTimerEnd();
 
 protected:
 
