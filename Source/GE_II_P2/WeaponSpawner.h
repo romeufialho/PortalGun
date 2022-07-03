@@ -34,7 +34,7 @@ protected:
 	UStaticMeshComponent* StaticMesh ;
 
 	//Location to Spawn Weapon
-	UPROPERTY(VisibleAnywhere, Category = "WeaponSpawner")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "WeaponSpawner")
 	USceneComponent* WeaponLocation;
 
 	//Trigger

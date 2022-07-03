@@ -50,6 +50,7 @@ void AWeaponSpawner::SpawnWeapon()
 	FRotator Rotation = GetActorRotation();
 	//TODO: this is crashing
 	SpawnedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToSpawn, Location, Rotation);
+	SpawnedWeapon->AttachToComponent(WeaponLocation, FAttachmentTransformRules::KeepWorldTransform, "None");
 }
 
 
