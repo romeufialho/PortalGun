@@ -18,6 +18,13 @@ public:
 	// Sets default values for this actor's properties
 	AWeaponSpawner();
 
+	//Weapon to Spawn
+	UPROPERTY(EditAnywhere, Category = "WeaponSpawner", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AWeapon> WeaponToSpawn;
+
+	UPROPERTY()
+	AWeapon* SpawnedWeapon;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,9 +33,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "WeaponSpawner")
 	UStaticMeshComponent* StaticMesh ;
 
-	//Weapon to Spawn
+	//Location to Spawn Weapon
 	UPROPERTY(VisibleAnywhere, Category = "WeaponSpawner")
-	USkeletalMeshComponent* Weapon;
+	USceneComponent* WeaponLocation;
 
 	//Trigger
 	UPROPERTY(VisibleAnywhere, Category= "WeaponSpawner")
@@ -45,7 +52,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	static void SpawnWeapon(AWeapon* Weapon);
+	void SpawnWeapon();
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

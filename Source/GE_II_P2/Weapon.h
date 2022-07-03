@@ -20,6 +20,14 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	USkeletalMeshComponent* WeaponMesh;
 
+	// Weapon ID
+	UPROPERTY()
+	int WeaponID;
+	// 0 = AR
+	// 1 = Shotgun
+	// 2 = Rocket
+	// 3 = Portal
+
 protected:
 
 	// /////////////////////// FUNCTIONS ////////////////////////////////////

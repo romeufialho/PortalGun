@@ -96,6 +96,12 @@ void AGE_II_P2Character::BeginPlay()
 
 	SetCanBeDamaged(true);
 
+	// Set gun to AR
+	if (CurrentWeapon != nullptr)
+	{
+		FP_Gun->SkeletalMesh = CurrentWeapon->WeaponMesh->SkeletalMesh;
+	}
+
 }
 
 void AGE_II_P2Character::Tick(float DeltaSeconds)
@@ -549,9 +555,10 @@ void AGE_II_P2Character::NextWeapon()
 
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, FString::Printf(TEXT("next weaponn")));
 
-	SetGunColor(Colors_BulletTypesArray[CurrentBulletType]);
+	SetGunColor(Colors_BulletTypesArray[CurrentBulletType]); 
 }
-void AGE_II_P2Character::PreviousWeapon() {
+void AGE_II_P2Character::PreviousWeapon()
+{
 	if (CurrentBulletType == 0) {
 		CurrentBulletType = Size_BulletTypesArray.Num()-1;
 	}
@@ -570,17 +577,6 @@ void ReceiveAnyDamage(float Damage,	const class UDamageType* DamageType,class AC
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 void AGE_II_P2Character::SetGunColor(FLinearColor ColorIn) {
 	FVector4 NewColor;
@@ -609,5 +605,10 @@ float AGE_II_P2Character::GetCurrentPlayer_FireRateBulletType()
 float AGE_II_P2Character::GetCurrentPlayer_RadiusBulletType()
 {
 	return Radius_BulletTypesArray[CurrentBulletType];
+}
+
+void AGE_II_P2Character::SetCurrentWeapon(AWeapon* NewCurrentWeapon)
+{
+	CurrentWeapon = NewCurrentWeapon;
 }
 

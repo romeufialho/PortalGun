@@ -18,11 +18,11 @@ AWeaponSpawner::AWeaponSpawner()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SpawnerMesh"));
 	StaticMesh->SetupAttachment(RootComponent);
 
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSkeletalMesh"));
-	Weapon->SetupAttachment(RootComponent);
+	WeaponLocation = CreateDefaultSubobject<USceneComponent>(TEXT("WeaponActor"));
+	WeaponLocation->SetupAttachment(RootComponent);
 
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
-	BoxComponent->SetupAttachment(Weapon);
+	BoxComponent->SetupAttachment(WeaponLocation);
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AWeaponSpawner::OnOverlapBegin);
 	BoxComponent->OnComponentEndOverlap.AddDynamic(this, &AWeaponSpawner::OnOverlapEnd);
 	BoxComponent->SetGenerateOverlapEvents(true);
@@ -34,6 +34,7 @@ void AWeaponSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SpawnWeapon();
 }
 
 // Called every frame
@@ -43,10 +44,14 @@ void AWeaponSpawner::Tick(float DeltaTime)
 
 }
 
-void AWeaponSpawner::SpawnWeapon(AWeapon* Weapon)
+void AWeaponSpawner::SpawnWeapon()
 {
-	//TODO: Spawn given weapon actor with upwards offset
+	FVector Location = WeaponLocation->GetComponentLocation();
+	FRotator Rotation = GetActorRotation();
+	//TODO: this is crashing
+	SpawnedWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToSpawn, Location, Rotation);
 }
+
 
 void AWeaponSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -63,9 +68,14 @@ void AWeaponSpawner::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Overlap With Player Detected"));
 				
-				if (Weapon->GetVisibleFlag())
+				if (WeaponLocation->GetVisibleFlag())
 				{
-					Weapon->SetVisibility(false);
+					UE_LOG(LogTemp, Warning, TEXT("Weapon Collected"));
+					WeaponLocation->SetVisibility(false);
+					if(SpawnedWeapon != nullptr)
+					{
+						SpawnedWeapon->Destroy();
+					}
 					//TODO: update player's available weapon
 					StartTimer();
 				}else
@@ -88,7 +98,8 @@ void AWeaponSpawner::StartTimer()
 
 void AWeaponSpawner::OnTimerEnd()
 {
-	Weapon->SetVisibility(true);
 	UE_LOG(LogTemp, Warning, TEXT("Weapon Cooldown Over"));
+	WeaponLocation->SetVisibility(true);
+	SpawnWeapon();
 }
 

@@ -5,12 +5,10 @@
 #include "CoreMinimal.h"
 #include "GE_II_P2HUD.h"
 #include "GE_II_P2Projectile.h"
+#include "Weapon.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/Pawn.h"
 #include "Templates/Casts.h"
 #include "Math/Color.h"
-#include "Kismet/GameplayStatics.h"
-
 
 
 #include "GE_II_P2Character.generated.h"
@@ -225,6 +223,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TArray<float>Radius_BulletTypesArray = { 1.f, 20.f, 40.f, 0.f };
 
+	UPROPERTY(EditAnywhere, Category="Weapon")
+	TArray<AWeapon*>WeaponInventory;
+
 
 	int GetPlayerCurrentBulletType();
 
@@ -234,7 +235,15 @@ public:
 
 	float GetCurrentPlayer_RadiusBulletType();
 
-	void SetGunColor(FLinearColor ColorIn);		
+	void SetGunColor(FLinearColor ColorIn);
+
+////////////////////////////////////////////////////////////////////////////////
+	
+	UPROPERTY()
+	AWeapon* CurrentWeapon;
+
+	UFUNCTION()
+	void SetCurrentWeapon(AWeapon* NewCurrentWeapon);
 	
 };
 
