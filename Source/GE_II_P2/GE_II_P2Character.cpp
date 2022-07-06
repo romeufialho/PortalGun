@@ -95,12 +95,7 @@ void AGE_II_P2Character::BeginPlay()
 	SetGunColor(Colors_BulletTypesArray[CurrentBulletType]);
 
 	SetCanBeDamaged(true);
-
-	// Set gun to AR
-	if (CurrentWeapon != nullptr)
-	{
-		FP_Gun->SkeletalMesh = CurrentWeapon->WeaponMesh->SkeletalMesh;
-	}
+	
 
 }
 
@@ -607,8 +602,4 @@ float AGE_II_P2Character::GetCurrentPlayer_RadiusBulletType()
 	return Radius_BulletTypesArray[CurrentBulletType];
 }
 
-void AGE_II_P2Character::SetCurrentWeapon(AWeapon* NewCurrentWeapon)
-{
-	CurrentWeapon = NewCurrentWeapon;
-}
 

@@ -237,13 +237,7 @@ public:
 
 	void SetGunColor(FLinearColor ColorIn);
 
-////////////////////////////////////////////////////////////////////////////////
-	
-	UPROPERTY()
-	AWeapon* CurrentWeapon;
 
-	UFUNCTION()
-	void SetCurrentWeapon(AWeapon* NewCurrentWeapon);
 	
 };
 
